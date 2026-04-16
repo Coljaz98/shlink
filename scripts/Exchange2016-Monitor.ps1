@@ -338,11 +338,12 @@ function Test-Mailfluss {
 
     # ── Test-Mailflow (lokal) ─────────────────────────────────────────────────
     try {
-        $tm = Test-Mailflow -ErrorAction Stop
-        # value__ == 0 bedeutet Enum-Wert "Success" - sprachunabhaengig,
-        # da Exchange auf deutschen Systemen "Erfolgreich" zurueckgibt.
-        if ($tm.TestMailflowResult.value__ -ne 0) {
-            Write-Fehler "Test-Mailflow fehlgeschlagen: $($tm.TestMailflowResult) | Latenz: $($tm.MessageLatencyTime)"
+        $tm        = Test-Mailflow -ErrorAction Stop
+        $tmResult  = [string]$tm.TestMailflowResult
+        # Sprachunabhaengiger Vergleich: Exchange gibt je nach Systemsprache
+        # "Success" (EN) oder "Erfolgreich" (DE) zurueck.
+        if ($tmResult -notmatch "(?i)^(success|erfolgreich)$") {
+            Write-Fehler "Test-Mailflow fehlgeschlagen: $tmResult | Latenz: $($tm.MessageLatencyTime)"
         }
         else {
             Write-OK "Test-Mailflow erfolgreich | Latenz: $($tm.MessageLatencyTime)"
